@@ -143,20 +143,6 @@ dt_string = now.strftime("%m/%d/%Y")
 
 run_name = 'Random Forest Tuning ' + dt_string
 
-class ModelWrapper(PythonModel):
-    def __init__(self):
-        self.model = None
-
-    def load_context(self, context):
-        from joblib import load
-
-        self.model = load(context.artifacts["model_path"])
-
-    def predict(self, context, model_input, params=None):
-
-        return self.model.predict_proba(model_input)
-
-
 with mlflow.start_run(run_name=run_name) as run:
     
     print('Logging random forest performance to Experiment Tracker')
@@ -215,10 +201,8 @@ with mlflow.start_run(run_name=run_name) as run:
             mlflow.log_metric("f1_score", m_f1_score)
             mlflow.log_metric("precision_score", m_precision_score)
             mlflow.log_metric("recall_score", m_recall_score)
-
-            model = ModelWrapper(rf)
             
-            mlflow.sklearn.log_model(model,
+            mlflow.sklearn.log_model(rf,
                          artifact_path="rf_model",
                          signature=signature,
                          )
